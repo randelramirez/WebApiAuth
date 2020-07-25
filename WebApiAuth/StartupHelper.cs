@@ -26,5 +26,15 @@ namespace WebApiAuth
               
             }
         }
+
+        public static void CreateIdentityDatabase(this IApplicationBuilder application)
+        {
+            using (var serviceScope = application.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<WebApiAuthUserContext>();
+
+                context.Database.EnsureCreated();
+            }
+        }
     }
 }
