@@ -38,7 +38,6 @@ namespace WebApiAuth.Controllers
 
             if (user != null && await userManager.CheckPasswordAsync(user, model.Password))
             {
-                // Flow from Pluralsight: Building a Web App with ASP.NET Core, MVC, Entity Framework Core, Bootstrap, and Angular
                 var claims = new Claim[]
                 {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
