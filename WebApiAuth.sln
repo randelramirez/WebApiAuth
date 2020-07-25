@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiAuth", "WebApiAuth\WebApiAuth.csproj", "{FB24E087-246D-4C92-BF8C-17FD12552A93}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB24E087-246D-4C92-BF8C-17FD12552A93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB24E087-246D-4C92-BF8C-17FD12552A93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB24E087-246D-4C92-BF8C-17FD12552A93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB24E087-246D-4C92-BF8C-17FD12552A93}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D71225F-392F-4E8F-BDBD-BB49EF4BE2FE}
+	EndGlobalSection
+EndGlobal
