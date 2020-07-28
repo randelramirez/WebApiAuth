@@ -54,24 +54,8 @@ namespace WebApiAuth.Controllers
         public async Task<ActionResult<WebApiAuthUser>> Get(Guid userId)
         {
             // if userId is not a Guid, the action will return 400 BadRequest
-
             var user = await userManager.FindByIdAsync(userId.ToString());
             if(user != null)
-            {
-                return Ok(user);
-            }
-
-            return NotFound();
-        }
-
-        [AllowAnonymous]
-        [HttpGet("{userId:string}")]
-        public async Task<ActionResult<WebApiAuthUser>> GetUser(string userId)
-        {
-            // if userId is not a Guid, the action will return 400 BadRequest
-
-            var user = await this.userService.GetUserAsync(userId);
-            if (user != null)
             {
                 return Ok(user);
             }

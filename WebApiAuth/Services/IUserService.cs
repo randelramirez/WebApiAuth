@@ -14,6 +14,6 @@ namespace WebApiAuth.Services
 
         Task<WebApiAuthUser> GetUserByUserName(string userName);
 
-        IEnumerable<WebApiAuthUser> GetAll(string userNameFilter = "");
+        IEnumerable<WebApiAuthUser> GetAll(string userNameFilter);
     }
 }

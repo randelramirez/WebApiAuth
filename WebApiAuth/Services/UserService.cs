@@ -16,7 +16,7 @@ namespace WebApiAuth.Services
             this.dataContext = dataContext;
         }
 
-        public  IEnumerable<WebApiAuthUser> GetAll(string userNameFilter = "")
+        public  IEnumerable<WebApiAuthUser> GetAll(string userNameFilter)
         {
             var users = this.dataContext.Users.AsQueryable();
             if(!string.IsNullOrEmpty(userNameFilter))
