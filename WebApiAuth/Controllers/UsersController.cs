@@ -64,7 +64,8 @@ namespace WebApiAuth.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("authenticate1")]
+        [Route(nameof(UsersController.Authenticate1))]
+        [HttpPost]
         public async Task<IActionResult> Authenticate1(AuthenticateModel model)
         {
 
@@ -105,7 +106,8 @@ namespace WebApiAuth.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("authenticate2")]
+        [Route(nameof(UsersController.Authenticate2))]
+        [HttpPost]
         public async Task<IActionResult> Authenticate2([FromBody] AuthenticateModel model)
         {
             //var user = userManager.Authenticate(model.Username, model.Password);
@@ -146,7 +148,8 @@ namespace WebApiAuth.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("register")]
+        [Route(nameof(UsersController.Register))]
+        [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var result = await userManager.CreateAsync(new WebApiAuthUser() { Email = model.Email, UserName = model.UserName }, model.Password);
