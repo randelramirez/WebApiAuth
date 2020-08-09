@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WebApiAuth.Models;
 using WebApiAuth.Services;
@@ -32,6 +33,9 @@ namespace WebApiAuth
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            services.Configure<JwtOptions>(Configuration.GetSection("Tokens"));
+         
             services.AddScoped<IUserService, UserService>();
 
             services.AddControllers();
@@ -51,15 +55,18 @@ namespace WebApiAuth
             services.AddIdentity<WebApiAuthUser, IdentityRole>()
                 .AddEntityFrameworkStores<WebApiAuthUserContext>();
 
+            // perhaps move the next 2 lines of code in a local method? We need them only to bind jwtsettings.json to be strongly typed here in ConfigureServices
+            var jwtOptions = new JwtOptions();
+            Configuration.GetSection("Tokens").Bind(jwtOptions);
             services.AddAuthentication()
                   .AddJwtBearer(options =>
                   {
                       // This specifies which parameters will be used to validate the token
                       options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
                       {
-                          ValidIssuer = Configuration["Tokens:Issuer"],
-                          ValidAudience = Configuration["Tokens:Audience"],
-                          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"]))
+                          ValidIssuer = jwtOptions.Issuer,
+                          ValidAudience = jwtOptions.Audience,
+                          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
                       };
                   });
 
@@ -105,7 +112,7 @@ namespace WebApiAuth
                 app.SeedDataContext();
                 app.CreateIdentityDatabase();
             }
-
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();

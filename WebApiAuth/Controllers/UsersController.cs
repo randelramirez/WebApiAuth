@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WebApiAuth.Models;
 using WebApiAuth.Services;
@@ -23,13 +24,14 @@ namespace WebApiAuth.Controllers
     {
         private readonly Microsoft.AspNetCore.Identity.UserManager<WebApiAuthUser> userManager;
         private readonly IUserService userService;
-        private readonly IConfiguration configuration;
+        //private readonly IOptions<JwtSettings> jwtConfig;
+        private readonly JwtOptions jwtConfig;
 
-        public UsersController(UserManager<WebApiAuthUser> userManager, IUserService userService, IConfiguration configuration)
+        public UsersController(UserManager<WebApiAuthUser> userManager, IUserService userService, IOptions<JwtOptions> jwtConfig)
         {
             this.userManager = userManager;
             this.userService = userService;
-            this.configuration = configuration;
+            this.jwtConfig = jwtConfig.Value;
         }
 
         // We do not need the FromQuery attribute since this is an API controller, 
@@ -81,12 +83,12 @@ namespace WebApiAuth.Controllers
                 };
 
                 //var tokenKeyConfig = Encoding.UTF8.GetBytes(configuration.GetSection("Token:Key").Value);
-                var tokenKeyConfig = configuration["Tokens:Key"];
+                var tokenKeyConfig = this.jwtConfig.Key;
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKeyConfig));
                 var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                var token = new JwtSecurityToken(issuer: configuration["Tokens:Issuer"],
-                    audience: configuration["Tokens:Audience"],
+                var token = new JwtSecurityToken(issuer: this.jwtConfig.Issuer,
+                    audience: this.jwtConfig.Audience,
                     claims: claims,
                     expires: DateTime.UtcNow.AddMinutes(30),
                     signingCredentials: signingCredentials);
@@ -119,7 +121,7 @@ namespace WebApiAuth.Controllers
             if (await userManager.CheckPasswordAsync(user, model.Password))
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(configuration["Tokens:Key"]);
+                var key = Encoding.ASCII.GetBytes(this.jwtConfig.Key);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
