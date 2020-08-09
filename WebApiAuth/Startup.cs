@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,12 +34,15 @@ namespace WebApiAuth
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
             services.Configure<JwtOptions>(Configuration.GetSection("Tokens"));
-         
+
             services.AddScoped<IUserService, UserService>();
 
-            services.AddControllers();
+            const string APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme = nameof(APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme);
+            services.AddControllers(options => {
+                //Add [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] globally
+                options.Filters.Add(new AuthorizeFilter(APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme)); 
+            });
 
             services.AddDbContextPool<DataContext>(options =>
             {
@@ -59,16 +63,29 @@ namespace WebApiAuth
             var jwtOptions = new JwtOptions();
             Configuration.GetSection("Tokens").Bind(jwtOptions);
             services.AddAuthentication()
-                  .AddJwtBearer(options =>
-                  {
-                      // This specifies which parameters will be used to validate the token
-                      options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
-                      {
-                          ValidIssuer = jwtOptions.Issuer,
-                          ValidAudience = jwtOptions.Audience,
-                          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
-                      };
-                  });
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+
+                    // This specifies which parameters will be used to validate the token
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                    {
+                        ValidIssuer = jwtOptions.Issuer,
+                        ValidAudience = jwtOptions.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
+                    };
+                });
+
+            services.AddAuthorization(options =>
+            {
+                // Set up to add [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] globally
+                // We add it on the middleware (middleware all requests vs filters(attribute) controller or action level only)
+                options.AddPolicy(APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme, b =>
+                {
+                    b.RequireAuthenticatedUser();
+                    b.AuthenticationSchemes = new List<string> { JwtBearerDefaults.AuthenticationScheme };
+                });
+            });
+
 
             // for api/users/authentication2
             //services.AddAuthentication()
@@ -112,7 +129,7 @@ namespace WebApiAuth
                 app.SeedDataContext();
                 app.CreateIdentityDatabase();
             }
-            
+
             app.UseHttpsRedirection();
 
             app.UseRouting();

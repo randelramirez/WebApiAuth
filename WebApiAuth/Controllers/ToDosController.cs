@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,8 @@ namespace WebApiAuth.Controllers
 {
    
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    // We have applied the the following filter and set the default AuthenticationSchemes to JwtBearerDefaults.AuthenticationScheme
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     public class ToDosController : ControllerBase
     {
