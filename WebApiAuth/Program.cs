@@ -18,9 +18,14 @@ namespace WebApiAuth
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                //.ConfigureAppConfiguration((config) => config.AddJsonFile("jwtsettings.json"))
+                .ConfigureAppConfiguration(AddAppConfiguration)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        public static void AddAppConfiguration(IConfigurationBuilder config) =>
+            config.AddJsonFile("jwtsettings.json", optional: true);
     }
 }

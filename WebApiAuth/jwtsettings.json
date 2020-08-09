@@ -1,0 +1,7 @@
+{
+  "Tokens": {
+    "Key": "KeyForJWTWebApiAuth",
+    "Issuer": "localhost",
+    "Audience": "WebApiAuthClient"
+  }
+}
