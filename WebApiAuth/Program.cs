@@ -26,6 +26,6 @@ namespace WebApiAuth
                 });
 
         public static void AddAppConfiguration(IConfigurationBuilder config) =>
-            config.AddJsonFile("jwtsettings.json", optional: true);
+            config.AddJsonFile("jwtsettings.json", optional: true, reloadOnChange: true);
     }
 }
