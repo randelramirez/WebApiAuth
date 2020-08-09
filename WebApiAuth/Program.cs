@@ -25,7 +25,13 @@ namespace WebApiAuth
                     webBuilder.UseStartup<Startup>();
                 });
 
-        public static void AddAppConfiguration(IConfigurationBuilder config) =>
+        // override the default adding of appsetting.json file + custom settings
+        public static void AddAppConfiguration(HostBuilderContext hostContext, IConfigurationBuilder config)
+        {
+            // make appsettings is mandatory
+            config.AddJsonFile("appsettings.json", optional: false);
+            config.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", optional: true);
             config.AddJsonFile("jwtsettings.json", optional: true, reloadOnChange: true);
+        }
     }
 }
