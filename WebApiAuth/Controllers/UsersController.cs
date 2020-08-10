@@ -82,6 +82,13 @@ namespace WebApiAuth.Controllers
                     new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
                 };
 
+                // claims from [AspNetUserClaims] provided by ASP.NET Core Identity
+                var userClaims = await userManager.GetClaimsAsync(user);
+
+                var allClaims = new List<Claim>();
+                allClaims.AddRange(claims);
+                allClaims.AddRange(userClaims);
+               
                 //var tokenKeyConfig = Encoding.UTF8.GetBytes(configuration.GetSection("Token:Key").Value);
                 var tokenKeyConfig = this.jwtConfig.Key;
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKeyConfig));
@@ -89,7 +96,7 @@ namespace WebApiAuth.Controllers
 
                 var token = new JwtSecurityToken(issuer: this.jwtConfig.Issuer,
                     audience: this.jwtConfig.Audience,
-                    claims: claims,
+                    claims: allClaims,
                     expires: DateTime.UtcNow.AddMinutes(30),
                     signingCredentials: signingCredentials);
 
@@ -154,9 +161,13 @@ namespace WebApiAuth.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            var result = await userManager.CreateAsync(new WebApiAuthUser() { Email = model.Email, UserName = model.UserName }, model.Password);
+            var user = new WebApiAuthUser() { Email = model.Email, UserName = model.UserName };
+            var result = await userManager.CreateAsync(user, model.Password);
+            
             if (result.Succeeded)
             {
+                
+                await userManager.AddClaimAsync(user, new Claim("CustomClaim", $"{user.NormalizedUserName}/{user.Email}"));
                 return Ok();
             }
             else

@@ -24,6 +24,8 @@ namespace WebApiAuth
 {
     public class Startup
     {
+        const string APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme = nameof(APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme);
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -38,11 +40,15 @@ namespace WebApiAuth
 
             services.AddScoped<IUserService, UserService>();
 
-            const string APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme = nameof(APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme);
-            services.AddControllers(options => {
-                //Add [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] globally
-                options.Filters.Add(new AuthorizeFilter(APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme)); 
-            });
+            #region Option 1: Add Authorize Attribute/Filter globally with Auth Scheme as JWT
+            //services.AddControllers(options =>
+            //{
+            //    //Add [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] globally
+            //    options.Filters.Add(new AuthorizeFilter(APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme));
+            //});
+            #endregion
+
+            services.AddControllers();
 
             services.AddDbContextPool<DataContext>(options =>
             {
@@ -139,7 +145,10 @@ namespace WebApiAuth
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers()
+                #region  Option 2: add to controllers pipeline
+                    .RequireAuthorization(APPLY_AUTHORIZE_WITH_JwtBearerDefaults_AuthenticationScheme);
+                #endregion
             });
         }
     }
